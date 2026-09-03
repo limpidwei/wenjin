@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="conduct-deep-research 1.0.0-alpha1">
+  <title>从搜索答案到改善判断｜模型原生深度研究产品重构报告</title>
+  <link rel="stylesheet" href="./report.css">
+</head>
+<body>
+  <header class="cover">
+    <div class="cover-kicker">深度调研报告 · DEEP RESEARCH</div>
+    <div class="cover-title">
+      <h1>从“搜索答案”到“改善判断”</h1>
+      <p class="cover-subtitle">模型原生深度研究产品的轻量化重构</p>
+      <p class="cover-note">本文件既是可编辑报告模板，也是排版链的端到端测试样本。实际使用时应以真实研究内容完整替换。</p>
+    </div>
+    <div class="cover-meta">
+      <div><span>Research cutoff</span><strong>2026 年 9 月 1 日</strong></div>
+      <div><span>Prepared for</span><strong>个人决策者</strong></div>
+      <div><span>Scope</span><strong>产品定位、研究方法、报告体验与实施边界</strong></div>
+    </div>
+  </header>
+
+  <main class="report-body">
+    <nav class="toc" aria-label="目录">
+      <span class="eyebrow">REPORT MAP</span>
+      <h2>目录 / Contents</h2>
+      <ol class="toc-list">
+        <li><a href="#executive"><span class="toc-number">01</span><span><strong>执行摘要</strong><small>核心判断与重构原则</small></span></a></li>
+        <li><a href="#target"><span class="toc-number">02</span><span><strong>目标体验</strong><small>秘塔与 Perplexity 的共同范式</small></span></a></li>
+        <li><a href="#method"><span class="toc-number">03</span><span><strong>研究方法</strong><small>模型原生循环与语义停止</small></span></a></li>
+        <li><a href="#architecture"><span class="toc-number">04</span><span><strong>技术架构</strong><small>HTML、Chromium 与视觉反馈</small></span></a></li>
+        <li><a href="#comparison"><span class="toc-number">05</span><span><strong>路线比较</strong><small>旧控制平台与新产品主线</small></span></a></li>
+        <li><a href="#risks"><span class="toc-number">06</span><span><strong>反证与风险</strong><small>自由度增加后的质量控制</small></span></a></li>
+        <li><a href="#actions"><span class="toc-number">07</span><span><strong>实施建议</strong><small>可执行工作包与验收</small></span></a></li>
+        <li><a href="#sources"><span class="toc-number">08</span><span><strong>来源与方法</strong><small>公开材料和本地视觉样板</small></span></a></li>
+      </ol>
+    </nav>
+
+    <section class="executive" id="executive">
+      <span class="eyebrow">DECISION BRIEF</span>
+      <h2>执行摘要</h2>
+      <div class="executive-grid">
+        <div>
+          <p class="executive-lead">深度研究产品的价值不在于把模型装进更复杂的状态机，而在于让用户获得一次可信、可追溯且能改变判断的认知更新。对个人自用场景，模型原生研究能力已经足以承担规划、检索、阅读、比较和综合。</p>
+          <p>秘塔公开页面把深度研究描述为先形成框架、再搜索整合，并持续追搜直到逻辑闭环<a class="citation" href="#source-1" aria-label="来源 1">[1]</a>。Perplexity Research 同样强调迭代搜索、阅读材料、动态调整研究计划并综合为完整报告<a class="citation" href="#source-2" aria-label="来源 2">[2]</a>。这说明用户真正感知的是研究与交付体验，而不是后台存在多少协议。</p>
+        </div>
+        <ol class="key-findings">
+          <li><span class="index">01</span><p><strong>研究层应变轻。</strong>保留原页核验、反证和语义饱和，删除外置生命周期。</p></li>
+          <li><span class="index">02</span><p><strong>报告层应变强。</strong>HTML 是可编辑源，PDF 是稳定成品，引用贯穿两者。</p></li>
+          <li><span class="index">03</span><p><strong>视觉质量必须闭环。</strong>浏览器成功生成 PDF 不等于报告真正可读。</p></li>
+          <li><span class="index">04</span><p><strong>真实任务优先于合成门。</strong>熟悉、陌生和带立场问题共同决定产品是否有效。</p></li>
+        </ol>
+      </div>
+
+      <div class="metric-grid" aria-label="目标结果概览">
+        <article class="metric"><strong>1</strong><span>一条模型原生研究循环</span><small>计划随证据修订</small></article>
+        <article class="metric"><strong>2</strong><span>HTML 与 PDF 两个正式形态</span><small>同一内容来源</small></article>
+        <article class="metric"><strong>0</strong><span>外置生命周期状态机</span><small>不再证明 lease 或 receipt</small></article>
+      </div>
+    </section>
+
+    <section class="chapter page-start" id="target">
+      <span class="section-number">CHAPTER 02</span>
+      <h2 class="chapter-title">目标体验：像研究助手，而不是流程引擎</h2>
+      <p class="lead">产品参照决定“用户应该得到什么”，不决定内部必须复制什么。</p>
+
+      <h3 class="section-heading">共同的研究报告范式</h3>
+      <p>秘塔和 Perplexity 的公开体验都围绕同一个闭环：先理解问题，使用搜索和阅读不断修订认识，再把材料综合成一份可以继续阅读、分享或导出的报告。Perplexity 还明确提供 PDF/文档导出，以及可编辑和分享的研究报告<a class="citation" href="#source-2" aria-label="来源 2">[2]</a><a class="citation" href="#source-3" aria-label="来源 3">[3]</a>。</p>
+
+      <aside class="callout insight">
+        <span class="callout-label">CORE INSIGHT</span>
+        <h3>应复刻结果层，不复刻后台猜想</h3>
+        <p>对个人 Skill，最重要的四个体验是自主迭代、正文可追溯、结构化长报告和稳定 PDF。后台任务、商业搜索索引、多租户权限和跨宿主协议不是当前产品的一部分。</p>
+      </aside>
+
+      <h3 class="section-heading">从功能清单转向用户结果</h3>
+      <p>“读了多少页”与“调用了多少次工具”只是成本记录，不能证明研究质量。真正的完成信号是：读者能讲清机制和争议；关键数字可以抽查；最强反证得到呈现；报告给出对选择和行动的含义。即使最终结论与用户原判断一致，只要证据显著增强、边界变清或不确定性下降，也属于有效认知更新。</p>
+    </section>
+
+    <section class="chapter page-start" id="method">
+      <span class="section-number">CHAPTER 03</span>
+      <h2 class="chapter-title">研究方法：用纪律增强模型，不用协议替代模型</h2>
+      <p class="lead">研究自由不是降低标准，而是把约束放在真正会影响结论的位置。</p>
+
+      <h3 class="section-heading">一张可修订的判断表</h3>
+      <p>研究开始时只需要写下当前最可能判断、最强替代解释，以及什么证据能够区分两者。新材料出现后直接更新这张表。它提供研究方向，却不会像冻结的问题树一样迫使模型完成已经失去价值的分支。</p>
+
+      <div class="comparison-grid">
+        <article class="comparison-card">
+          <h3>主判断</h3>
+          <dl>
+            <div><dt>当前解释</dt><dd>模型原生循环足以满足个人研究</dd></div>
+            <div><dt>支持证据</dt><dd>宿主已有网页、文件、代码和视觉能力</dd></div>
+            <div><dt>失败条件</dt><dd>真实任务持续浅搜或无法保持引用准确</dd></div>
+          </dl>
+        </article>
+        <article class="comparison-card">
+          <h3>替代解释</h3>
+          <dl>
+            <div><dt>可能性</dt><dd>没有外部控制器就无法稳定达到深度</dd></div>
+            <div><dt>区分证据</dt><dd>三个真实问题的错误、反证和用户反馈</dd></div>
+            <div><dt>应对方式</dt><dd>先改研究纪律，再判断是否需要局部工具</dd></div>
+          </dl>
+        </article>
+      </div>
+
+      <h3 class="section-heading">语义停止，而不是计数停止</h3>
+      <p>当与问题相关的口径、现状、机制、比较、失败和数据缺口已经被扫过，核心结论认真尝试过推翻，继续检索只会重复已有判断时，研究可以进入综合。若公开证据不足，应保留未知而不是以低质量转载补足来源数。</p>
+
+      <aside class="callout risk">
+        <span class="callout-label">COUNTEREVIDENCE</span>
+        <h3>更自由的研究可能更早停止</h3>
+        <p>这是新版最重要的反证风险。控制方式不是恢复十轮、八十查询之类的门，而是用熟悉主题检查明显错误、用预设立场主题检查迎合、用来源抽查检查引用支持度。只有真实失败反复出现时，才增加针对性的约束。</p>
+      </aside>
+    </section>
+
+    <section class="chapter page-start" id="architecture">
+      <span class="section-number">CHAPTER 04</span>
+      <h2 class="chapter-title">技术架构：HTML 是源，PDF 是快照</h2>
+      <p class="lead">开放判断留给模型；重复、脆弱的排版动作交给小型确定性工具。</p>
+
+      <figure class="figure keep-together">
+        <figcaption>图 1　模型原生研究到正式报告的最小链路</figcaption>
+        <svg viewBox="0 0 960 330" role="img" aria-labelledby="flow-title flow-desc">
+          <title id="flow-title">模型原生研究报告链</title>
+          <desc id="flow-desc">用户问题经过模型研究、HTML 创作、Chromium PDF 和逐页视觉复核。</desc>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#e94560"/>
+            </marker>
+          </defs>
+          <rect x="15" y="92" width="150" height="105" rx="10" fill="#1a1a2e"/>
+          <text x="90" y="132" text-anchor="middle" fill="#fff" font-size="20" font-weight="700">用户问题</text>
+          <text x="90" y="162" text-anchor="middle" fill="#cfd1dc" font-size="14">用途 · 范围 · 预算</text>
+          <path d="M 170 145 H 245" stroke="#e94560" stroke-width="4" marker-end="url(#arrow)"/>
+          <rect x="255" y="60" width="195" height="170" rx="10" fill="#f3f4f6" stroke="#1a1a2e" stroke-width="2"/>
+          <text x="352" y="105" text-anchor="middle" fill="#1a1a2e" font-size="20" font-weight="700">模型原生研究</text>
+          <text x="352" y="139" text-anchor="middle" fill="#555a65" font-size="14">搜索 · 原页 · 计算</text>
+          <text x="352" y="166" text-anchor="middle" fill="#555a65" font-size="14">比较 · 反证 · 综合</text>
+          <text x="352" y="199" text-anchor="middle" fill="#e94560" font-size="13" font-weight="700">路径随证据调整</text>
+          <path d="M 455 145 H 530" stroke="#e94560" stroke-width="4" marker-end="url(#arrow)"/>
+          <rect x="540" y="92" width="150" height="105" rx="10" fill="#fff" stroke="#1a1a2e" stroke-width="2"/>
+          <text x="615" y="132" text-anchor="middle" fill="#1a1a2e" font-size="20" font-weight="700">report.html</text>
+          <text x="615" y="162" text-anchor="middle" fill="#555a65" font-size="14">引用 · 组件 · SVG</text>
+          <path d="M 695 145 H 770" stroke="#e94560" stroke-width="4" marker-end="url(#arrow)"/>
+          <rect x="780" y="60" width="165" height="170" rx="10" fill="#f7f2ea" stroke="#1a1a2e" stroke-width="2"/>
+          <text x="862" y="105" text-anchor="middle" fill="#1a1a2e" font-size="20" font-weight="700">正式 PDF</text>
+          <text x="862" y="139" text-anchor="middle" fill="#555a65" font-size="14">Chromium 打印</text>
+          <text x="862" y="166" text-anchor="middle" fill="#555a65" font-size="14">逐页转图复核</text>
+          <path d="M 862 235 C 862 292 615 305 615 207" fill="none" stroke="#e94560" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#arrow)"/>
+          <text x="752" y="286" text-anchor="middle" fill="#c72e49" font-size="13" font-weight="700">看图后回改 HTML</text>
+        </svg>
+        <p class="figure-note">技术层只处理可重复的出版动作，不决定研究是否充分。</p>
+      </figure>
+
+      <h3 class="section-heading">为什么选择 Chromium</h3>
+      <p>项目 PDF 样板的 Producer 为 Chromium/Skia，说明 HTML/CSS 是实现该类封面、目录、表格与长文排版的可行路径。Chrome 从 131 版起支持打印页的 CSS margin boxes 和页码计数<a class="citation" href="#source-4" aria-label="来源 4">[4]</a>；Playwright 的 `page.pdf()` 可使用 print CSS、打印背景和 CSS 页型<a class="citation" href="#source-5" aria-label="来源 5">[5]</a>。</p>
+
+      <h3 class="section-heading">为什么仍要逐页看图</h3>
+      <p>HTML 结构正确不代表分页正确。字体加载、长标题、表格跨页和浏览器碎片化都可能在 PDF 中产生问题。把 PDF 转成 contact sheet 可以先观察整体节奏，再对可疑页查看原图；这比增加更多内容 schema 更直接地改善最终成品。</p>
+    </section>
+
+    <section class="chapter page-start" id="comparison">
+      <span class="section-number">CHAPTER 05</span>
+      <h2 class="chapter-title">路线比较：复杂度应投向哪里</h2>
+      <p class="lead">同样的工程投入，放在研究状态证明和放在真实报告闭环，会产生不同用户价值。</p>
+
+      <figure class="data-table">
+        <figcaption>表 1　旧控制平台与 v1 模型原生路线对比</figcaption>
+        <table>
+          <thead>
+            <tr><th>维度</th><th>v0.4 控制平台</th><th>v1 模型原生产品</th><th>决策含义</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>研究路径</td><td>冻结计划、wave、action 和状态转换</td><td>模型根据证据动态调整</td><td>开放问题需要适应性，不需要预先穷举</td></tr>
+            <tr><td>完成判断</td><td>轮次、查询、候选、打开页、覆盖和饱和硬门</td><td>关键维度、反证、未知和语义饱和</td><td>避免为满足代理指标而制造低价值工作</td></tr>
+            <tr><td>可追溯性</td><td>内部 claim/source ledger 与 hash chain</td><td>正文附近引用到原页</td><td>保留用户真正会使用的透明度</td></tr>
+            <tr><td>报告源</td><td>Report IR 再编译 HTML/DOCX</td><td>模型直接创作语义化 HTML</td><td>减少双份内容和组件 schema 限制</td></tr>
+            <tr><td>正式成品</td><td>HTML、PDF、DOCX 多门并行</td><td>HTML 可编辑，PDF 正式，DOCX 按需</td><td>把视觉精力集中在一种正式版式</td></tr>
+            <tr><td>视觉验收</td><td>结构校验很多，真实渲染长期待验</td><td>生成后立即逐页转图并由模型检查</td><td>以用户看见的页面作为事实</td></tr>
+            <tr><td>跨宿主</td><td>profile、adapter、preflight 和 executor</td><td>依赖当前宿主原生能力</td><td>个人版不支付平台化成本</td></tr>
+            <tr><td>失败恢复</td><td>lease、retry、journal、reconcile</td><td>使用宿主会话和普通文件</td><td>接受个人任务可重新继续的低成本方式</td></tr>
+          </tbody>
+        </table>
+        <p class="table-note">表格比较的是当前产品目标下的适配度，不否定旧架构在团队审计或跨宿主平台中的价值。</p>
+      </figure>
+
+      <p>最关键的变化不是“少写代码”，而是重新分配确定性：来源是否支持事实、PDF 是否溢出适合严格检查；研究应该先查哪个分支、哪种结构最能解释结论则应留给模型判断。</p>
+    </section>
+
+    <section class="chapter page-start" id="risks">
+      <span class="section-number">CHAPTER 06</span>
+      <h2 class="chapter-title">反证与风险：轻量不等于放任</h2>
+      <p class="lead">新版成立的前提需要通过真实任务验证，而不能由架构简洁本身证明。</p>
+
+      <h3 class="section-heading">四个最可能的失败方式</h3>
+      <ol class="timeline">
+        <li><time>风险 01</time><div><h3>研究过早收尾</h3><p>模型在找到一组一致来源后停止，没有暴露替代解释。用带预设立场的真实问题检查，而不是恢复固定搜索数量。</p></div></li>
+        <li><time>风险 02</time><div><h3>引用存在但不支持附近表述</h3><p>链接只能证明主题相关，不能证明数字或因果。交付前抽查关键引用原页，并降低超出来源的措辞强度。</p></div></li>
+        <li><time>风险 03</time><div><h3>HTML 自由度造成视觉漂移</h3><p>模型新增局部布局时可能破坏打印页。固定全局 CSS、机械检查横向溢出，并查看每一页 PDF。</p></div></li>
+        <li><time>风险 04</time><div><h3>“像产品”掩盖内容稀薄</h3><p>漂亮卡片可能放大少量信息。验收时检查每页是否带来新信息或判断，以及事实是否持续连接到 so-what。</p></div></li>
+      </ol>
+
+      <aside class="callout risk">
+        <span class="callout-label">LIMITATION</span>
+        <h3>本模板只验证出版链，不证明研究质量</h3>
+        <p>当前示例内容来自产品重构材料和少量公开产品说明，它能够覆盖版式组件，却不能替代熟悉、陌生和带预设立场三个真实研究任务。v1 只有完成真实任务后才能进入个人稳定版。</p>
+      </aside>
+    </section>
+
+    <section class="chapter page-start" id="actions">
+      <span class="section-number">CHAPTER 07</span>
+      <h2 class="chapter-title">实施建议：先闭环一份报告</h2>
+      <p class="lead">最短成功路径是让一个真实问题完成研究、HTML、PDF、看图和修订，而不是先清理全部旧代码。</p>
+
+      <h3 class="section-heading">执行顺序</h3>
+      <ul class="action-list">
+        <li><span class="marker">01</span><p><strong>冻结旧基线。</strong>保存 v0.4 发布包和校准摘要，明确其为历史产品。</p></li>
+        <li><span class="marker">02</span><p><strong>建立干净 v1。</strong>只放 Skill、两份指南、报告资产和三个结果工具。</p></li>
+        <li><span class="marker">03</span><p><strong>跑通排版 fixture。</strong>验证中文字体、长表格、页码、引用和逐页转图。</p></li>
+        <li><span class="marker">04</span><p><strong>完成第一份真实报告。</strong>用结果暴露研究纪律和模板的真实问题。</p></li>
+        <li><span class="marker">05</span><p><strong>再做两类校准。</strong>熟悉主题查错，预设立场主题查迎合。</p></li>
+      </ul>
+
+      <h3 class="section-heading">可直接用于项目评审的 Talking Points</h3>
+      <ol class="talking-points">
+        <li><h3>我们删除的不是质量，而是错误的质量代理。</h3><p>关键事实仍需打开原页，反证和局限仍然存在；取消的是无法直接证明用户理解变好的查询计数与生命周期协议。</p></li>
+        <li><h3>HTML 不是降级交付，而是报告的可编辑源。</h3><p>同一 HTML 能承载可点击来源、表格、SVG 和打印样式，再由固定 Chromium 输出正式 PDF，避免 HTML 与 DOCX 各自改写事实。</p></li>
+        <li><h3>真实逐页视觉检查是新架构唯一不能省的硬环。</h3><p>它直接验证用户看到的成品，正好补上旧版长期只有结构通过、视觉待验的证据缺口。</p></li>
+      </ol>
+    </section>
+
+    <section class="appendix" id="sources">
+      <span class="eyebrow">SOURCES & METHOD</span>
+      <h2 class="appendix-title">来源与方法</h2>
+      <div class="method-note keep-together">
+        <p><strong>方法说明。</strong>本模板以项目内产品目标、旧架构审验、PDF 样板描述以及下列公开产品和浏览器文档为输入。它的用途是验证组件、打印和视觉复核流程；结论仍需通过真实研究任务校准。</p>
+        <p class="small-print">研究截止：2026-09-01。公开网页可能更新；实际报告应记录自己的研究截止时间和访问日期。</p>
+      </div>
+
+      <ol class="sources">
+        <li class="source-entry" id="source-1"><span class="source-number">01</span><div><a href="https://metaso.cn/">秘塔 AI 搜索：首页与深度研究入口</a><p>用于确认公开产品对“先思考框架、再搜索整合、多线迭代追搜”的描述。访问于 2026-09-01。</p></div></li>
+        <li class="source-entry" id="source-2"><span class="source-number">02</span><div><a href="https://www.perplexity.ai/help-center/en/articles/10738684-what-is-research-mode">Perplexity Help Center：What is Research mode?</a><p>用于确认迭代研究、报告综合和 PDF/文档导出体验。访问于 2026-09-01。</p></div></li>
+        <li class="source-entry" id="source-3"><span class="source-number">03</span><div><a href="https://www.perplexity.ai/help-center/en/articles/13600190-what-s-new-in-advanced-deep-research">Perplexity Help Center：What's New in Advanced Deep Research</a><p>用于确认澄清问题、过程中追问、进度展示和可编辑报告等公开体验。访问于 2026-09-01。</p></div></li>
+        <li class="source-entry" id="source-4"><span class="source-number">04</span><div><a href="https://developer.chrome.com/blog/print-margins">Chrome for Developers：Add content to the margins of web pages when printed using CSS</a><p>用于确认 Chromium 131 起的分页 margin boxes 与 page/pages 计数支持。发布于 2024-10-30。</p></div></li>
+        <li class="source-entry" id="source-5"><span class="source-number">05</span><div><a href="https://playwright.dev/docs/api/class-page#page-pdf">Playwright：Page.pdf API</a><p>用于确认 print media、printBackground、preferCSSPageSize、outline 与 tagged PDF 等输出参数。</p></div></li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>
