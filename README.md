@@ -1,9 +1,11 @@
-# conduct-deep-research · 深度调研 Skill
+# 问津 Wenjin · 深度调研 Skill
 
-> **大多数 AI 调研的问题，不是查得不够多，而是完美地回答了错误的问题。**
+> **问津者，先问路，再上路。**
 
 一个装在 Claude Code / Hermes / Codex 里的调研方法论：先帮你把问题想清楚，再去把它研究透，
 最后交付一份带引用、有反证、结论强度不超过证据的报告。
+
+**大多数 AI 调研的问题，不是查得不够多，而是完美地回答了错误的问题。**
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![依赖: 零](https://img.shields.io/badge/核心依赖-零-brightgreen)
@@ -88,11 +90,11 @@ deep 需你明确要求），要加档先报成本、等你确认，不会失控
 
 ## 三种做法对比
 
-| | 网页版调研产品 | 直接让 AI 调研 | conduct-deep-research |
+| | 网页版调研产品 | 直接让 AI 调研 | 问津 Wenjin |
 |---|---|---|---|
 | 成本 | 订阅贵，额度烧得快 | 看宿主订阅 | 用你已订阅的 Agent，零增量 |
 | 工作流 | 报告要手动下载再导入 agent，卡在人工阻塞点 | 对话里出结果，散落各处 | 需求→报告→知识库，本地一键闭环 |
-| 上下文 | 每次都冷启动 | 限于当前对话 | 接自己的 wiki，越用越懂你 |
+| 上下文 | 每次都冷启动 | 限于当前对话 | 带着你的知识库开工，越用越懂你 |
 | 需求澄清 | 不问，直接开写 | 不问，直接开写 | 先锚定"要改变什么判断"，有歧义先问 |
 | 事实来源 | 部分核验 | 搜索摘要 + 模型记忆 | 关键事实必须打开原页核验 |
 | 反证 | 默认顺着问题写 | 默认顺着问题写 | 必须主动尝试推翻核心结论 |
@@ -114,13 +116,13 @@ deep 需你明确要求），要加档先报成本、等你确认，不会失控
 **Windows（PowerShell，复制回车即可）：**
 
 ```powershell
-irm https://raw.githubusercontent.com/limpidwei/conduct-deep-research/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/limpidwei/wenjin/main/install.ps1 | iex
 ```
 
 **macOS / Linux：**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/limpidwei/conduct-deep-research/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/limpidwei/wenjin/main/install.sh | bash
 ```
 
 默认装到 Claude Code 技能目录（`~/.claude/skills`）。研究主流程**零依赖**，装完即可用。
@@ -128,7 +130,7 @@ curl -fsSL https://raw.githubusercontent.com/limpidwei/conduct-deep-research/mai
 装到 Hermes（Windows）：
 
 ```powershell
-irm https://raw.githubusercontent.com/limpidwei/conduct-deep-research/main/install.ps1 -OutFile "$env:TEMP\cdr-install.ps1"; & "$env:TEMP\cdr-install.ps1" -Target "$env:LOCALAPPDATA\hermes\skills\research"
+irm https://raw.githubusercontent.com/limpidwei/wenjin/main/install.ps1 -OutFile "$env:TEMP\wenjin-install.ps1"; & "$env:TEMP\wenjin-install.ps1" -Target "$env:LOCALAPPDATA\hermes\skills\research"
 ```
 
 ## 装完怎么用

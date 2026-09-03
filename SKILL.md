@@ -1,9 +1,9 @@
 ---
-name: conduct-deep-research
+name: wenjin
 description: Clarify the user's intended outcome and material ambiguities, investigate open-ended questions through iterative web and document research, and deliver a decision-ready cited report in the requested format. Use for 深度调研、研究报告、行业/产品/政策/技术比较、公开资料桌面尽调（非法律/财务/交易级正式尽调）；do not use for simple fact lookups, ordinary summaries, or document editing without new research.
 ---
 
-# Conduct Deep Research
+# 问津 Wenjin
 
 把宿主已有的搜索、浏览、文件、代码和视觉能力组织成一次真正改善用户判断的研究。模型按
 证据动态决定路径；本 Skill 不使用外置状态机、固定问题树、完整思维链展示或查询数量门。
