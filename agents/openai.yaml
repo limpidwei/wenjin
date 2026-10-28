@@ -1,6 +1,6 @@
 interface:
   display_name: "Deep Research"
-  short_description: "先确定预期结果，再迭代研究并按指定格式交付可决策报告"
+  short_description: "先问清要做什么决定，再研究、核验原页、找反证，交付带引用的报告并归档"
   default_prompt: "Use $wenjin to identify my intended outcome, clarify only material ambiguities, investigate this open question, and deliver a decision-ready cited report in my requested format."
 
 policy:
